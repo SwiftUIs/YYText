@@ -1504,20 +1504,44 @@ fail:
     }
     
     [self _insideComposedCharacterSequences:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
-        if (isVertical) {
-            position = fabs(left - point.y) < fabs(right - point.y) < (right ? prev : next);
+    if (isVertical) {
+        CGFloat leftDist = fabs(left - point.y);
+        CGFloat rightDist = fabs(right - point.y);
+        if (leftDist < rightDist) {
+            position = prev;
         } else {
-            position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
+            position = next;
         }
-    }];
-    
-    [self _insideEmoji:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
-        if (isVertical) {
-            position = fabs(left - point.y) < fabs(right - point.y) < (right ? prev : next);
+    } else {
+        CGFloat leftDist = fabs(left - point.x);
+        CGFloat rightDist = fabs(right - point.x);
+        if (leftDist < rightDist) {
+            position = prev;
         } else {
-            position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
+            position = next;
         }
-    }];
+    }
+}];
+
+[self _insideEmoji:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
+    if (isVertical) {
+        CGFloat leftDist = fabs(left - point.y);
+        CGFloat rightDist = fabs(right - point.y);
+        if (leftDist < rightDist) {
+            position = prev;
+        } else {
+            position = next;
+        }
+    } else {
+        CGFloat leftDist = fabs(left - point.x);
+        CGFloat rightDist = fabs(right - point.x);
+        if (leftDist < rightDist) {
+            position = prev;
+        } else {
+            position = next;
+        }
+    }
+}];
     
     if (position < _visibleRange.location) position = _visibleRange.location;
     else if (position > _visibleRange.location + _visibleRange.length) position = _visibleRange.location + _visibleRange.length;
